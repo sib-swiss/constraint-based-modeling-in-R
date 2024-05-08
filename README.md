@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# cobrar
+# cobrar <img src="man/figures/logo.svg" align="right" />
 
 <!-- badges: start -->
 
@@ -11,8 +11,7 @@
 The R package *cobrar* provides structures and functions for
 constraint-based metabolic network analysis, e.g. the prediction of
 metabolic fluxes using fluxes using Flux Balance Analysis (FBA).
-*cobrar* is inspired by the former by the former CRAN R package
-*sybil*[(1)](#R1).
+*cobrar* is inspired by the former CRAN R package *sybil*[(1)](#R1).
 
 ## Installation
 
@@ -36,8 +35,8 @@ sudo apt install libsbml-dev libglpk-dev
 Install cobrar (in *R*):
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("Waschina/cobrar")
+# install.packages("remotes")
+remotes::install_github("Waschina/cobrar")
 ```
 
 #### Centos/Fedora/RHEL
@@ -51,40 +50,23 @@ sudo yum install libsbml-devel glpk-devel
 Install cobrar (in *R*):
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("Waschina/cobrar")
+# install.packages("remotes")
+remotes::install_github("Waschina/cobrar")
 ```
 
 #### MacOS
 
-*libSBML* can be installed from source:
+*libSBML* and *glpk* can be installed using homebrew:
 
 ``` sh
-curl -LO https://github.com/sbmlteam/libsbml/archive/refs/tags/v5.20.2.tar.gz
-tar -zxf v5.20.2.tar.gz
-cd libsbml-5.20.2
-mkdir build
-cd build
-cmake -DENABLE_FBC=ON -DENABLE_GROUPS=ON ..
-make
-sudo make install 
-```
-
-Install *glpk* either homebrew or MacPorts:
-
-``` sh
-# Homebrew
-brew install glpk
-
-# OR: MacPorts
-sudo port install glpk
+brew install glpk brewsci/bio/libsbml
 ```
 
 Install cobrar (in *R*):
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("Waschina/cobrar")
+# install.packages("remotes")
+remotes::install_github("Waschina/cobrar")
 ```
 
 #### Windows

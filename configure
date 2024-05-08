@@ -586,7 +586,9 @@ PACKAGE_URL=''
 
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+GMP_CFLAGS
 GLPK_CFLAGS
+GMP_LIBS
 GLPK_LIBS
 OBJEXT
 EXEEXT
@@ -644,6 +646,7 @@ ac_user_opts='
 enable_option_checking
 with_libsbml
 with_glpk
+with_gmp
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1279,6 +1282,8 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-libsbml=PATH     Specify libsbml installation path
   --with-glpk=PATH        Specify glpk installation path
+  --with-gmp=PATH         Specify gmp (GNU multiple precision arithmetic
+                          library) installation path
 
 Some influential environment variables:
   PKG_CONFIG  path to pkg-config utility
@@ -1415,37 +1420,6 @@ fi
   as_fn_set_status $ac_retval
 
 } # ac_fn_c_try_compile
-
-# ac_fn_c_check_header_compile LINENO HEADER VAR INCLUDES
-# -------------------------------------------------------
-# Tests whether HEADER exists and can be compiled using the include files in
-# INCLUDES, setting the cache variable VAR accordingly.
-ac_fn_c_check_header_compile ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
-$as_echo_n "checking for $2... " >&6; }
-if eval \${$3+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-#include <$2>
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  eval "$3=yes"
-else
-  eval "$3=no"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-fi
-eval ac_res=\$$3
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-
-} # ac_fn_c_check_header_compile
 
 # ac_fn_c_try_link LINENO
 # -----------------------
@@ -1848,8 +1822,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 # Initialize variables
 LIBSBML_LIBS=""
 GLPK_LIBS=""
+GMP_LIBS=""
 LIBSBML_CFLAGS=""
 GLPK_CFLAGS=""
+GMP_CFLAGS=""
 
 # Check for pkg-config
 
@@ -2789,11 +2765,11 @@ else
 
         # Check for libsbml
         if test "$HAVE_PKG_CONFIG" = "yes"; then
-            # Check for libsbml using pkg-config
+          # Check for libsbml using pkg-config
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for libsbml" >&5
-$as_echo_n "checking for libsbml... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for LIBSBML" >&5
+$as_echo_n "checking for LIBSBML... " >&6; }
 
 if test -n "$LIBSBML_CFLAGS"; then
     pkg_cv_LIBSBML_CFLAGS="$LIBSBML_CFLAGS"
@@ -2833,7 +2809,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -2849,31 +2825,13 @@ fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$LIBSBML_PKG_ERRORS" >&5
 
-	as_fn_error $? "Package requirements (libsbml) were not met:
-
-$LIBSBML_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables LIBSBML_CFLAGS
-and LIBSBML_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details." "$LINENO" 5
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: libsbml not found using pkg-config" >&5
+$as_echo "$as_me: libsbml not found using pkg-config" >&6;}
 elif test $pkg_failed = untried; then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables LIBSBML_CFLAGS
-and LIBSBML_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details" "$LINENO" 5; }
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: libsbml not found using pkg-config" >&5
+$as_echo "$as_me: libsbml not found using pkg-config" >&6;}
 else
 	LIBSBML_CFLAGS=$pkg_cv_LIBSBML_CFLAGS
 	LIBSBML_LIBS=$pkg_cv_LIBSBML_LIBS
@@ -2881,31 +2839,6 @@ else
 $as_echo "yes" >&6; }
 
 fi
-    	    if test "$LIBSBML_LIBS" != ""; then
-    	        # Check for FBC extension
-                ac_fn_c_check_header_compile "$LINENO" "sbml/packages/fbc/common/FbcExtensionTypes.h" "ac_cv_header_sbml_packages_fbc_common_FbcExtensionTypes_h" "#include <sbml/SBMLTypes.h>
-"
-if test "x$ac_cv_header_sbml_packages_fbc_common_FbcExtensionTypes_h" = xyes; then :
-
-else
-  as_fn_error $? "libsbml installation does not have the required FBC extension." "$LINENO" 5
-fi
-
-
-                # Check for FBC extension
-                ac_fn_c_check_header_compile "$LINENO" "sbml/packages/groups/common/GroupsExtensionTypes.h" "ac_cv_header_sbml_packages_groups_common_GroupsExtensionTypes_h" "#include <sbml/SBMLTypes.h>
-"
-if test "x$ac_cv_header_sbml_packages_groups_common_GroupsExtensionTypes_h" = xyes; then :
-
-else
-  as_fn_error $? "libsbml installation does not have the required groups extension." "$LINENO" 5
-fi
-
-
-            else
-                { $as_echo "$as_me:${as_lineno-$LINENO}: libsbml not found using pkg-config" >&5
-$as_echo "$as_me: libsbml not found using pkg-config" >&6;}
-            fi
         fi
 
         # Last try (no user input, no pkg-config result)
@@ -2943,26 +2876,6 @@ $as_echo "$ac_cv_lib_sbml_main" >&6; }
 if test "x$ac_cv_lib_sbml_main" = xyes; then :
 
                 LIBSBML_LIBS="-lsbml"
-                # Check for FBC extension
-                ac_fn_c_check_header_compile "$LINENO" "sbml/packages/fbc/common/FbcExtensionTypes.h" "ac_cv_header_sbml_packages_fbc_common_FbcExtensionTypes_h" "#include <sbml/SBMLTypes.h>
-"
-if test "x$ac_cv_header_sbml_packages_fbc_common_FbcExtensionTypes_h" = xyes; then :
-
-else
-  as_fn_error $? "libsbml installation does not have the required FBC extension." "$LINENO" 5
-fi
-
-
-                # Check for FBC extension
-                ac_fn_c_check_header_compile "$LINENO" "sbml/packages/groups/common/GroupsExtensionTypes.h" "ac_cv_header_sbml_packages_groups_common_GroupsExtensionTypes_h" "#include <sbml/SBMLTypes.h>
-"
-if test "x$ac_cv_header_sbml_packages_groups_common_GroupsExtensionTypes_h" = xyes; then :
-
-else
-  as_fn_error $? "libsbml installation does not have the required groups extension." "$LINENO" 5
-fi
-
-
 
 else
 
@@ -3040,7 +2953,82 @@ else
                     GLPK_LIBS="-L$(find $BREW_PREFIX/Cellar/glpk -name lib) -lglpk"
                     GLPK_CFLAGS="-I$(dirname `find $BREW_PREFIX/Cellar/GLPK -name glpk.h`)"
                 else
-                    as_fn_error $? "libsbml not found. Consider installing it with homebrew via 'brew install glpk'." "$LINENO" 5
+                    as_fn_error $? "glpk not found. Consider installing it with homebrew via 'brew install glpk'." "$LINENO" 5
+                fi
+            fi
+
+fi
+
+
+
+fi
+
+
+# Check for user-provided gmp path
+
+# Check whether --with-gmp was given.
+if test "${with_gmp+set}" = set; then :
+  withval=$with_gmp;
+        if test -d "$withval"; then
+            GMP_LIBS="-L$withval/lib -lgmp"
+            GMP_CFLAGS="$withval/include"
+        else
+            as_fn_error $? "Directory $withval does not exist" "$LINENO" 5
+        fi
+
+else
+
+        # Check for gmp in default and Homebrew paths as before
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for __gmpz_init in -lgmp" >&5
+$as_echo_n "checking for __gmpz_init in -lgmp... " >&6; }
+if ${ac_cv_lib_gmp___gmpz_init+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lgmp  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char __gmpz_init ();
+int
+main ()
+{
+return __gmpz_init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_gmp___gmpz_init=yes
+else
+  ac_cv_lib_gmp___gmpz_init=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gmp___gmpz_init" >&5
+$as_echo "$ac_cv_lib_gmp___gmpz_init" >&6; }
+if test "x$ac_cv_lib_gmp___gmpz_init" = xyes; then :
+
+            GMP_LIBS="-lgmp"
+
+else
+
+            if test "$(uname)" = "Darwin"; then
+                if test -n "$(command -v brew)"; then
+                    BREW_PREFIX=$(brew --prefix)
+                    GMP_LIBS="-L$(find $BREW_PREFIX/Cellar/gmp -name lib) -lgmp"
+                    GMP_CFLAGS="-I$(dirname `find $BREW_PREFIX/Cellar/GMP -name gmp.h`)"
+                else
+                    { $as_echo "$as_me:${as_lineno-$LINENO}: result: gmp (optional) not found. Consider installing it with homebrew via 'brew install gmp'." >&5
+$as_echo "gmp (optional) not found. Consider installing it with homebrew via 'brew install gmp'." >&6; }
                 fi
             fi
 
@@ -3057,6 +3045,8 @@ fi
 
 
 
+
+
 # output Makevars
 ac_config_files="$ac_config_files src/Makevars"
 
@@ -3066,6 +3056,8 @@ ac_config_files="$ac_config_files src/Makevars"
 $as_echo "libsbml found: $LIBSBML_CFLAGS $LIBSBML_LIBS" >&6; }
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: glpk found: $GLPK_CFLAGS $GLPK_LIBS" >&5
 $as_echo "glpk found: $GLPK_CFLAGS $GLPK_LIBS" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: gmp found: $GMP_CFLAGS $GMP_LIBS" >&5
+$as_echo "gmp found: $GMP_CFLAGS $GMP_LIBS" >&6; }
 
 # Output messages
 cat >confcache <<\_ACEOF
